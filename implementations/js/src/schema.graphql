@@ -1,0 +1,3 @@
+#import { Module } into Interface from "ens/goerli/interface.concurrent.wrappers.eth"
+
+type Module implements Interface_Module {}
