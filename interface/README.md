@@ -4,6 +4,28 @@ It allows wrappers to subinvoke multiple wrappers concurrently.
 
 This library has been implemented in an easily extensible way. It provides a common concurrency interface that can be shared across various concurrency implementations, like Threads, Processes and even language specific primitives like JavaScript Promises. We have already implemented the promise plugin implementation and will be adding more such implementations for primitives like threads and processes.
 
+## A quick primer terminology
+
+The interface uses some terms to describe concurrent programming that are common in some languages, but absent in others.
+
+```
+concurrent
+-> task(s)
+-> worker(s)
+```
+
+Defining terms:
+- concurrent plugin = an implementation of the concurrent interface, using a specific concurrency mechanism (threads, promises, etc)
+- task = a wrapper invocation
+- worker = an instance of the underlying concurrency mechanism (thread, promise, etc)
+
+You can:
+- set max number of workers
+- schedule tasks
+- check status of tasks
+- gather results of tasks (first, all, any)
+- abort tasks
+
 ## Usage
 
 - **If you are a Wrapper Developer** - You just need to import the Concurrent interface, and you can get all the implementations that the client has registered in the wrapper using `Interface.getImplementations` function.
