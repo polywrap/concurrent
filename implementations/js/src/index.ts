@@ -16,18 +16,12 @@ import {
   Module,
 } from "./wrap";
 
-export interface ConcurrentPromisePluginConfig extends Record<string, unknown> {
-  cache?: Map<string, string>;
-}
+type NoConfig = Record<string, never>;
 
-export class ConcurrentPromisePlugin extends Module<ConcurrentPromisePluginConfig> {
+export class ConcurrentPromisePlugin extends Module<NoConfig> {
   private _totalTasks = 0;
   private _tasks: Record<number, Promise<InvokeResult>> = {};
   private _status: Record<number, Interface_TaskStatus> = {};
-
-  constructor(config: ConcurrentPromisePluginConfig) {
-    super(config);
-  }
 
   public async result(
     input: Args_result,
@@ -88,7 +82,7 @@ export class ConcurrentPromisePlugin extends Module<ConcurrentPromisePluginConfi
   }
 
   public abort(args: Args_abort, client: CoreClient): Array<boolean> {
-    return args.taskIds.map(id => false);
+    return args.taskIds.map(_id => false);
   }
 
   private scheduleTask(task: Interface_Task, client: CoreClient): number {
@@ -128,9 +122,7 @@ export class ConcurrentPromisePlugin extends Module<ConcurrentPromisePluginConfi
   }
 }
 
-export const concurrentPromisePlugin: PluginFactory<
-  ConcurrentPromisePluginConfig
-> = (config: ConcurrentPromisePluginConfig) =>
-  new PluginPackage<ConcurrentPromisePluginConfig>(new ConcurrentPromisePlugin(config), manifest);
+export const concurrentPromisePlugin: PluginFactory<NoConfig> = () =>
+  new PluginPackage(new ConcurrentPromisePlugin({}), manifest);
 
 export const plugin = concurrentPromisePlugin;
