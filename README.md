@@ -6,9 +6,7 @@ Table Of Contents:
 1. [Concurrent Interface](./interface/README.md)
 2. [Concurrent Implementation (JavaScript Promise)](implementations/js/README.md)
 
-## A quick primer terminology
-
-The interface uses some terms to describe concurrent programming that are common in some languages, but absent in others.
+## A quick primer on terminology
 
 ```
 concurrent

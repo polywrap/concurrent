@@ -4,9 +4,7 @@ It allows wrappers to subinvoke multiple wrappers concurrently.
 
 This library has been implemented in an easily extensible way. It provides a common concurrency interface that can be shared across various concurrency implementations, like Threads, Processes and even language specific primitives like JavaScript Promises. We have already implemented the promise plugin implementation and will be adding more such implementations for primitives like threads and processes.
 
-## A quick primer terminology
-
-The interface uses some terms to describe concurrent programming that are common in some languages, but absent in others.
+## A quick primer on terminology
 
 ```
 concurrent
