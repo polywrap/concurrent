@@ -1,6 +1,4 @@
-import { CoreClient, InvokeResult } from "@polywrap/core-js";
-import { PluginFactory, PluginPackage } from "@polywrap/plugin-js";
-import { msgpackEncode } from "@polywrap/msgpack-js"
+import { Client, InvokeResult, PluginFactory, Uri } from "@polywrap/core-js";
 import {
   Args_abort,
   Args_result,
@@ -25,7 +23,7 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
 
   public async result(
     input: Args_result,
-    client: CoreClient
+    client: Client
   ): Promise<Array<Interface_TaskResult>> {
     switch (input.returnWhen) {
       case Interface_ReturnWhenEnum.FIRST_COMPLETED: {
@@ -41,15 +39,16 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
       }
       case Interface_ReturnWhenEnum.ANY_COMPLETED: {
         const result = await Promise.any(
-          input.taskIds.map((id) => this.resolveTask(id)
-            .then((result) => {
+          input.taskIds.map((id) =>
+            this.resolveTask(id).then((result) => {
               if (result.error) {
                 return Promise.reject(result.error);
               }
               return result;
             })
           )
-        ).catch((err: AggregateError) => input.taskIds.map((id, idx) => ({
+        ).catch((err: AggregateError) =>
+          input.taskIds.map((id, idx) => ({
             taskId: id,
             result: undefined,
             error: err.errors[idx],
@@ -59,18 +58,20 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
         return Array.isArray(result) ? result : [result];
       }
       default:
-        throw new Error("Invalid value of ReturnWhen enum: " + input.returnWhen);
+        throw new Error(
+          "Invalid value of ReturnWhen enum: " + input.returnWhen
+        );
     }
   }
 
   public async status(
     input: Args_status,
-    client: CoreClient
+    client: Client
   ): Promise<Array<Interface_TaskStatus>> {
     return input.taskIds.map((id) => this._status[id]);
   }
 
-  public schedule(input: Args_schedule, client: CoreClient): Array<Int> {
+  public schedule(input: Args_schedule, client: Client): Array<Int> {
     return input.tasks.map((task) => {
       return this.scheduleTask(
         {
@@ -81,12 +82,17 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
     });
   }
 
-  public abort(args: Args_abort, client: CoreClient): Array<boolean> {
-    return args.taskIds.map(_id => false);
+  public abort(args: Args_abort, client: Client): Array<boolean> {
+    return args.taskIds.map((_id) => false);
   }
 
-  private scheduleTask(task: Interface_Task, client: CoreClient): number {
-    this._tasks[this._totalTasks] = client.invoke(task);
+  private scheduleTask(task: Interface_Task, client: Client): number {
+    this._tasks[this._totalTasks] = client.invoke({
+      uri: Uri.from(task.uri),
+      method: task.method,
+      args: JSON.parse(task.args),
+      env: JSON.parse(task.env),
+    });
     this._status[this._totalTasks] = Interface_TaskStatusEnum.RUNNING;
     return this._totalTasks++;
   }
@@ -99,13 +105,15 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
           return {
             taskId,
             result: undefined,
-            error: result.error?.message ?? `Unknown error occurred in concurrent task ${taskId}`,
+            error:
+              result.error?.message ??
+              `Unknown error occurred in concurrent task ${taskId}`,
             status: Interface_TaskStatusEnum.FAILED,
           };
         }
         return {
           taskId: taskId,
-          result: new Uint8Array(msgpackEncode(result.value)),
+          result: JSON.stringify((result.value)),
           error: undefined,
           status: Interface_TaskStatusEnum.COMPLETED,
         };
@@ -115,14 +123,22 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
         return {
           taskId: taskId,
           result: undefined,
-          error: err.message ?? `Unknown error occurred in concurrent task ${taskId}`,
+          error:
+            err.message ??
+            `Unknown error occurred in concurrent task ${taskId}`,
           status: Interface_TaskStatusEnum.FAILED,
         };
       });
   }
 }
 
-export const concurrentPromisePlugin: PluginFactory<NoConfig> = () =>
-  new PluginPackage(new ConcurrentPromisePlugin({}), manifest);
+export const concurrentPromisePlugin: PluginFactory<NoConfig> = (
+  config: NoConfig
+) => {
+  return {
+    factory: () => new ConcurrentPromisePlugin(config),
+    manifest: manifest,
+  };
+};
 
 export const plugin = concurrentPromisePlugin;

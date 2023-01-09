@@ -15,12 +15,13 @@ enum ReturnWhen {
 type Task {
   uri: String!
   method: String!
-  args: Bytes!
+  args: JSON!
+  env: JSON!
 }
 
 type TaskResult {
   taskId: Int!
-  result: Bytes
+  result: JSON
   error: String
   status: TaskStatus!
 }
