@@ -1,5 +1,6 @@
-import { ClientConfigBuilder, PolywrapClient } from "@polywrap/client-js";
+import {ClientConfigBuilder, defaultPackages, PolywrapClient} from "@polywrap/client-js";
 import { concurrentPromisePlugin } from "../index";
+import { httpPlugin } from "@polywrap/http-plugin-js";
 
 jest.setTimeout(300000);
 
@@ -10,8 +11,13 @@ describe("e2e", () => {
   beforeAll(async () => {
     const config = new ClientConfigBuilder()
       .addDefaults()
+      .removePackage(defaultPackages.concurrent)
       .addPackage({
-        uri: "wrap://ens/goerli/interface.concurrent.wrappers.eth",
+        uri: "ens/wrappers.polywrap.eth:http@1.1.0",
+        package: httpPlugin({})
+        })
+      .addPackage({
+        uri: "ens/wrappers.polywrap.eth:concurrent@1.0.0",
         package: concurrentPromisePlugin({}),
       })
       .build()

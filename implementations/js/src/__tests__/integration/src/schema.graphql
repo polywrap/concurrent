@@ -1,8 +1,8 @@
-#import { Module } into HTTP from "ens/http.polywrap.eth"
-#import { Module, TaskResult } into Concurrent from "ens/goerli/interface.concurrent.wrappers.eth"
+#import { Module,  } into Http from "ens/wrappers.polywrap.eth:http@1.1.0"
+#import { Module, TaskResult } into Concurrent from "ens/wrappers.polywrap.eth:concurrent@1.0.0"
 
 type FetchResult implements Concurrent_TaskResult {
-  parsed: HTTP_Http_Response
+  parsed: Http_Response
 }
 
 type Module {
@@ -14,5 +14,5 @@ type Module {
   batchFetch(
     """ Calls mock http api with given delays sequentially"""
     delays: [String!]!
-  ): [HTTP_Http_Response!]!
+  ): [Http_Response!]!
 }

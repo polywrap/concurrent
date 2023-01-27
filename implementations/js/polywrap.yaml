@@ -1,10 +1,7 @@
-format: 0.2.0
+format: 0.3.0
 project:
   type: plugin/typescript
   name: concurrent-promise
 source:
   module: ./src/index.ts
   schema: ./src/schema.graphql
-  import_abis:
-    - uri: ens/goerli/interface.concurrent.wrappers.eth
-      abi: ../../interface/src/schema.graphql

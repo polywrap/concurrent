@@ -5,14 +5,14 @@ import {
   Concurrent_ReturnWhen,
   Concurrent_Task,
   FetchResult,
-  HTTP_Module,
-  HTTP_Http_Response,
-  HTTP_Http_ResponseType,
+  Http_Module,
+  Http_Response,
+  Http_ResponseType,
 } from "./wrap";
 import {
   serializegetArgs,
   deserializegetResult,
-} from "./wrap/imported/HTTP_Module/serialization";
+} from "./wrap/imported/Http_Module/serialization";
 
 export function asyncBatchFetch(args: Args_asyncBatchFetch): FetchResult[] {
   const tasks: Concurrent_Task[] = [];
@@ -24,12 +24,12 @@ export function asyncBatchFetch(args: Args_asyncBatchFetch): FetchResult[] {
         headers: null,
         urlParams: params,
         body: "",
-        responseType: HTTP_Http_ResponseType.TEXT,
+        responseType: Http_ResponseType.TEXT,
       },
     });
 
     const task: Concurrent_Task = {
-      uri: "wrap://ens/http.polywrap.eth",
+      uri: "ens/wrappers.polywrap.eth:http@1.1.0",
       method: "get",
       args: apiCall,
     };
@@ -70,19 +70,19 @@ export function asyncBatchFetch(args: Args_asyncBatchFetch): FetchResult[] {
   return parsedResults;
 }
 
-export function batchFetch(args: Args_batchFetch): HTTP_Http_Response[] {
-  const results: HTTP_Http_Response[] = [];
+export function batchFetch(args: Args_batchFetch): Http_Response[] {
+  const results: Http_Response[] = [];
   for (let i = 0; i < args.delays.length; i++) {
     const param = new Map<string, string>().set("seconds", args.delays[i]);
-    const apiResult = HTTP_Module.get({
+    const apiResult = Http_Module.get({
       url: "https://hub.dummyapis.com/delay",
       request: {
         headers: null,
         urlParams: param,
         body: "",
-        responseType: HTTP_Http_ResponseType.TEXT,
+        responseType: Http_ResponseType.TEXT,
       },
-    }).unwrap() as HTTP_Http_Response;
+    }).unwrap() as Http_Response;
 
     results.push(apiResult);
   }
