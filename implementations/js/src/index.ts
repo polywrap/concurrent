@@ -14,16 +14,18 @@ import {
   Module,
 } from "./wrap";
 
-type NoConfig = Record<string, never>;
+export interface ConcurrentPluginConfig extends Record<string, unknown> {
+  clientFactory: () => Client;
+}
 
-export class ConcurrentPromisePlugin extends Module<NoConfig> {
+export class ConcurrentPromisePlugin extends Module<ConcurrentPluginConfig> {
   private _totalTasks = 0;
   private _tasks: Record<number, Promise<InvokeResult>> = {};
   private _status: Record<number, Interface_TaskStatus> = {};
 
   public async result(
     input: Args_result,
-    client: Client
+    _: Client
   ): Promise<Array<Interface_TaskResult>> {
     switch (input.returnWhen) {
       case Interface_ReturnWhenEnum.FIRST_COMPLETED: {
@@ -66,27 +68,23 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
 
   public async status(
     input: Args_status,
-    client: Client
+    _: Client
   ): Promise<Array<Interface_TaskStatus>> {
     return input.taskIds.map((id) => this._status[id]);
   }
 
-  public schedule(input: Args_schedule, client: Client): Array<Int> {
+  public schedule(input: Args_schedule, _: Client): Array<Int> {
     return input.tasks.map((task) => {
-      return this.scheduleTask(
-        {
-          ...task,
-        },
-        client
-      );
+      return this.scheduleTask(task);
     });
   }
 
-  public abort(args: Args_abort, client: Client): Array<boolean> {
+  public abort(args: Args_abort, _: Client): Array<boolean> {
     return args.taskIds.map((_id) => false);
   }
 
-  private scheduleTask(task: Interface_Task, client: Client): number {
+  private scheduleTask(task: Interface_Task): number {
+    const client = this.config.clientFactory();
     this._tasks[this._totalTasks] = client.invoke({
       uri: Uri.from(task.uri),
       method: task.method,
@@ -101,7 +99,7 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
     return this._tasks[taskId]
       .then((result: InvokeResult) => {
         this._status[taskId] = Interface_TaskStatusEnum.COMPLETED;
-        if (!result.ok) {
+        if (!result.data) {
           return {
             taskId,
             result: undefined,
@@ -113,7 +111,7 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
         }
         return {
           taskId: taskId,
-          result: JSON.stringify((result.value)),
+          result: JSON.stringify(result.data),
           error: undefined,
           status: Interface_TaskStatusEnum.COMPLETED,
         };
@@ -132,8 +130,8 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
   }
 }
 
-export const concurrentPromisePlugin: PluginFactory<NoConfig> = (
-  config: NoConfig
+export const concurrentPromisePlugin: PluginFactory<ConcurrentPluginConfig> = (
+  config: ConcurrentPluginConfig
 ) => {
   return {
     factory: () => new ConcurrentPromisePlugin(config),
