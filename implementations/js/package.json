@@ -1,7 +1,7 @@
 {
   "name": "concurrent-plugin-js",
   "description": "Run wrapper concurrently using promise",
-  "version": "0.10.0-pre.7",
+  "version": "0.1.2",
   "license": "MIT",
   "repository": {
     "type": "git",
