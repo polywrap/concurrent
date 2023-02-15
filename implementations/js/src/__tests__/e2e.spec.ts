@@ -13,11 +13,11 @@ describe("e2e", () => {
       .addDefaults()
       .removePackage(defaultPackages.concurrent)
       .addPackage({
-        uri: "ens/wrappers.polywrap.eth:http@1.1.0",
+        uri: "ens/wraps.eth:http@1.1.0",
         package: httpPlugin({})
         })
       .addPackage({
-        uri: "ens/wrappers.polywrap.eth:concurrent@1.0.0",
+        uri: "ens/wraps.eth:concurrent@1.0.0",
         package: concurrentPromisePlugin({}),
       })
       .build()
