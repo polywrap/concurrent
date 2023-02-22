@@ -13,6 +13,9 @@ import {
   serializegetArgs,
   deserializegetResult,
 } from "./wrap/imported/Http_Module/serialization";
+import {Box} from "@polywrap/wasm-as";
+
+const httpUri =  "wrap://ens/wraps.eth:http@1.1.0";
 
 export function asyncBatchFetch(args: Args_asyncBatchFetch): FetchResult[] {
   const tasks: Concurrent_Task[] = [];
@@ -29,7 +32,7 @@ export function asyncBatchFetch(args: Args_asyncBatchFetch): FetchResult[] {
     });
 
     const task: Concurrent_Task = {
-      uri: "ens/wrappers.polywrap.eth:http@1.1.0",
+      uri: httpUri,
       method: "get",
       args: apiCall,
     };

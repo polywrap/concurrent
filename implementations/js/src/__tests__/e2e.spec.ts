@@ -1,6 +1,7 @@
-import {ClientConfigBuilder, defaultPackages, PolywrapClient} from "@polywrap/client-js";
+import {ClientConfigBuilder, defaultInterfaces, PolywrapClient} from "@polywrap/client-js";
 import { concurrentPromisePlugin } from "../index";
-import { httpPlugin } from "@polywrap/http-plugin-js";
+import {buildWrapper} from "@polywrap/test-env-js";
+import { httpPlugin } from "temp-http-plugin-js";
 
 jest.setTimeout(300000);
 
@@ -9,20 +10,17 @@ describe("e2e", () => {
   let fsUri: string;
 
   beforeAll(async () => {
+    const wrapperPath = `${__dirname}/integration`;
+    await buildWrapper(wrapperPath);
+    fsUri = `fs/${wrapperPath}/build`;
+
     const config = new ClientConfigBuilder()
       .addDefaults()
-      .removePackage(defaultPackages.concurrent)
-      .addPackage({
-        uri: "ens/wrappers.polywrap.eth:http@1.1.0",
-        package: httpPlugin({})
-        })
-      .addPackage({
-        uri: "ens/wrappers.polywrap.eth:concurrent@1.0.0",
-        package: concurrentPromisePlugin({}),
-      })
-      .build()
+      .removePackage(defaultInterfaces.concurrent)
+      .addPackage("ens/wraps.eth:http@1.1.0", httpPlugin({}))
+      .addPackage("ens/wraps.eth:concurrent@1.0.0", concurrentPromisePlugin({}))
+      .build();
     client = new PolywrapClient(config);
-    fsUri = `fs/${__dirname}/integration/build`;
   });
 
   test("asyncBatchFetch", async () => {
