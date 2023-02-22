@@ -1,4 +1,4 @@
-import { CoreClient, InvokeResult } from "@polywrap/core-js";
+import {CoreClient, InvokeResult, Uri} from "@polywrap/core-js";
 import { PluginFactory, PluginPackage } from "@polywrap/plugin-js";
 import { msgpackEncode } from "@polywrap/msgpack-js"
 import {
@@ -86,7 +86,11 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
   }
 
   private scheduleTask(task: Interface_Task, client: CoreClient): number {
-    this._tasks[this._totalTasks] = client.invoke(task);
+    this._tasks[this._totalTasks] = client.invoke({
+      uri: Uri.from(task.uri),
+      method: task.method,
+      args: task.args,
+    });
     this._status[this._totalTasks] = Interface_TaskStatusEnum.RUNNING;
     return this._totalTasks++;
   }
