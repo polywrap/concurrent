@@ -1,4 +1,4 @@
-import {CoreClient, InvokeResult, Uri} from "@polywrap/core-js";
+import { CoreClient, InvokeResult, Uri } from "@polywrap/core-js";
 import { PluginFactory, PluginPackage } from "@polywrap/plugin-js";
 import { msgpackEncode } from "@polywrap/msgpack-js"
 import {
@@ -7,11 +7,11 @@ import {
   Args_schedule,
   Args_status,
   Int,
-  Interface_ReturnWhenEnum,
-  Interface_Task,
-  Interface_TaskResult,
-  Interface_TaskStatus,
-  Interface_TaskStatusEnum,
+  Concurrent_ReturnWhenEnum,
+  Concurrent_Task,
+  Concurrent_TaskResult,
+  Concurrent_TaskStatus,
+  Concurrent_TaskStatusEnum,
   manifest,
   Module,
 } from "./wrap";
@@ -21,25 +21,25 @@ type NoConfig = Record<string, never>;
 export class ConcurrentPromisePlugin extends Module<NoConfig> {
   private _totalTasks = 0;
   private _tasks: Record<number, Promise<InvokeResult>> = {};
-  private _status: Record<number, Interface_TaskStatus> = {};
+  private _status: Record<number, Concurrent_TaskStatus> = {};
 
   public async result(
     input: Args_result,
     client: CoreClient
-  ): Promise<Array<Interface_TaskResult>> {
+  ): Promise<Array<Concurrent_TaskResult>> {
     switch (input.returnWhen) {
-      case Interface_ReturnWhenEnum.FIRST_COMPLETED: {
+      case Concurrent_ReturnWhenEnum.FIRST_COMPLETED: {
         const result = await Promise.race(
           input.taskIds.map((id) => this.resolveTask(id))
         );
         return [result];
       }
-      case Interface_ReturnWhenEnum.ALL_COMPLETED: {
+      case Concurrent_ReturnWhenEnum.ALL_COMPLETED: {
         return await Promise.all(
           input.taskIds.map((id) => this.resolveTask(id))
         );
       }
-      case Interface_ReturnWhenEnum.ANY_COMPLETED: {
+      case Concurrent_ReturnWhenEnum.ANY_COMPLETED: {
         const result = await Promise.any(
           input.taskIds.map((id) => this.resolveTask(id)
             .then((result) => {
@@ -53,7 +53,7 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
             taskId: id,
             result: undefined,
             error: err.errors[idx],
-            status: Interface_TaskStatusEnum.FAILED,
+            status: Concurrent_TaskStatusEnum.FAILED,
           }))
         );
         return Array.isArray(result) ? result : [result];
@@ -66,7 +66,7 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
   public async status(
     input: Args_status,
     client: CoreClient
-  ): Promise<Array<Interface_TaskStatus>> {
+  ): Promise<Array<Concurrent_TaskStatus>> {
     return input.taskIds.map((id) => this._status[id]);
   }
 
@@ -85,42 +85,42 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
     return args.taskIds.map(_id => false);
   }
 
-  private scheduleTask(task: Interface_Task, client: CoreClient): number {
+  private scheduleTask(task: Concurrent_Task, client: CoreClient): number {
     this._tasks[this._totalTasks] = client.invoke({
       uri: Uri.from(task.uri),
       method: task.method,
       args: task.args,
     });
-    this._status[this._totalTasks] = Interface_TaskStatusEnum.RUNNING;
+    this._status[this._totalTasks] = Concurrent_TaskStatusEnum.RUNNING;
     return this._totalTasks++;
   }
 
-  private resolveTask(taskId: number): Promise<Interface_TaskResult> {
+  private resolveTask(taskId: number): Promise<Concurrent_TaskResult> {
     return this._tasks[taskId]
       .then((result: InvokeResult) => {
-        this._status[taskId] = Interface_TaskStatusEnum.COMPLETED;
+        this._status[taskId] = Concurrent_TaskStatusEnum.COMPLETED;
         if (!result.ok) {
           return {
             taskId,
             result: undefined,
             error: result.error?.message ?? `Unknown error occurred in concurrent task ${taskId}`,
-            status: Interface_TaskStatusEnum.FAILED,
+            status: Concurrent_TaskStatusEnum.FAILED,
           };
         }
         return {
           taskId: taskId,
           result: new Uint8Array(msgpackEncode(result.value)),
           error: undefined,
-          status: Interface_TaskStatusEnum.COMPLETED,
+          status: Concurrent_TaskStatusEnum.COMPLETED,
         };
       })
       .catch((err) => {
-        this._status[taskId] = Interface_TaskStatusEnum.FAILED;
+        this._status[taskId] = Concurrent_TaskStatusEnum.FAILED;
         return {
           taskId: taskId,
           result: undefined,
           error: err.message ?? `Unknown error occurred in concurrent task ${taskId}`,
-          status: Interface_TaskStatusEnum.FAILED,
+          status: Concurrent_TaskStatusEnum.FAILED,
         };
       });
   }

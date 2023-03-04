@@ -1166,6 +1166,14 @@
   resolved "https://registry.yarnpkg.com/@polywrap/asyncify-js/-/asyncify-js-0.10.0-pre.10.tgz#ecc21ce37e468c6da8c43fdb35e2cad4fe6d63cb"
   integrity sha512-KurmLTRvhzFCfJkIgsj/eYCxacAsIwIwu8XRqjpjvL47BPNBYuqflaJgFwrRrPpq16TPSNBDFGRm6RMlATXFDA==
 
+"@polywrap/cli-js@0.10.0-pre.10":
+  version "0.10.0-pre.10"
+  resolved "https://registry.yarnpkg.com/@polywrap/cli-js/-/cli-js-0.10.0-pre.10.tgz#a4ff5e1ae1fe88f1e64c11892caf79764c514e86"
+  integrity sha512-aIaX+NUYc9DylhDoA0fearHMwq53bDQXVBX157NJRI0Fr8IoaTsz1ll3pr4LWdURVzmbEIh2XeEdPEVLB1Tm4Q==
+  dependencies:
+    polywrap "0.10.0-pre.10"
+    spawn-command "0.0.2-1"
+
 "@polywrap/client-config-builder-js@0.10.0-pre.10":
   version "0.10.0-pre.10"
   resolved "https://registry.yarnpkg.com/@polywrap/client-config-builder-js/-/client-config-builder-js-0.10.0-pre.10.tgz#6b49bad4e4f07b3b9ae6c87a173c1a3c2d9288f1"

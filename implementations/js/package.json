@@ -34,7 +34,7 @@
   "devDependencies": {
     "@polywrap/client-js": "0.10.0-pre.10",
     "@polywrap/http-plugin-js": "0.10.0-pre.10",
-    "@polywrap/test-env-js": "0.10.0-pre.10",
+    "@polywrap/cli-js": "0.10.0-pre.10",
     "@types/jest": "26.0.8",
     "@types/prettier": "2.6.0",
     "polywrap": "0.10.0-pre.10",

@@ -1,17 +1,14 @@
 module.exports = {
-  collectCoverage: false,
-  preset: "ts-jest",
-  testEnvironment: "node",
-  testMatch: ["**/__tests__/**/e2e.spec.ts"],
-  modulePathIgnorePatterns: [
-    "./src/__tests__/mutation",
-    "./src/__tests__/query",
-    "./src/__tests__/utils",
-  ],
-  globals: {
-    "ts-jest": {
-      tsconfig: "tsconfig.json",
-      diagnostics: false,
-    },
+  roots: ["<rootDir>/src"],
+  testMatch: ["**/?(*.)+(spec|test).+(ts|tsx|js)"],
+  transform: {
+    "^.+\\.(ts|tsx)$": "ts-jest",
   },
+  modulePathIgnorePatterns: ["<rootDir>/src/__tests__/e2e/integration/"],
+  testPathIgnorePatterns: [
+    "<rootDir>/src/__tests__/e2e/integration/",
+    "/.polywrap"
+  ],
+  transformIgnorePatterns: ["<rootDir>/src/__tests__/e2e/integration/"],
+  testEnvironment: "node",
 };
