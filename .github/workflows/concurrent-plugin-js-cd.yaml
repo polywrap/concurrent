@@ -3,6 +3,8 @@ name: concurrent-plugin-js-cd
 on:
   pull_request:
     types: [closed]
+    branches:
+      - main
     paths:
       - "implementations/js/**"
 
@@ -11,6 +13,7 @@ jobs:
     name: concurrent-plugin-js-cd
     if: |
       github.event.pull_request.merged &&
+      startsWith(github.event.pull_request.title, '[CD]') != true &&
       github.event.pull_request.user.login != 'github-actions'
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -22,6 +25,21 @@ jobs:
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
         working-directory: ./implementations/js
+
+      - name: Read VERSION into env.RELEASE_VERSION
+        working-directory: ./implementations/js
+        run: |
+          echo RELEASE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g') >> $GITHUB_ENV
+
+      - name: Is Pre-Release
+        run: |
+          STR="${RELEASE_VERSION}"
+          SUB='pre.'
+          if [[ "$STR" == *"$SUB"* ]]; then
+            echo PRE_RELEASE=true >> $GITHUB_ENV
+          else
+            echo PRE_RELEASE=false >> $GITHUB_ENV
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@master
@@ -43,8 +61,16 @@ jobs:
           echo $(npm whoami --registry https://registry.npmjs.org/)
         working-directory: ./implementations/js
 
-      - name: Publish to NPM
+      - name: Publish To NPM (Latest)
+        if: env.PRE_RELEASE == 'false'
         run: yarn publish:npm
+        working-directory: ./implementations/js
+        env:
+          NPM_AUTH_TOKEN: ${{secrets.POLYWRAP_BUILD_BOT_NPM_PAT}}
+
+      - name: Publish Node Packages To NPM (Pre-Release)
+        if: env.PRE_RELEASE == 'true'
+        run: yarn publish:pre:npm
         working-directory: ./implementations/js
         env:
           NPM_AUTH_TOKEN: ${{secrets.POLYWRAP_BUILD_BOT_NPM_PAT}}

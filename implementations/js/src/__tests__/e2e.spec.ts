@@ -1,7 +1,7 @@
-import {ClientConfigBuilder, defaultInterfaces, PolywrapClient} from "@polywrap/client-js";
+import { ClientConfigBuilder, defaultInterfaces, PolywrapClient } from "@polywrap/client-js";
 import { concurrentPromisePlugin } from "../index";
-import {buildWrapper} from "@polywrap/test-env-js";
-import { httpPlugin } from "temp-http-plugin-js";
+import { Commands } from "@polywrap/cli-js";
+import { httpPlugin } from "@polywrap/http-plugin-js";
 
 jest.setTimeout(300000);
 
@@ -11,7 +11,17 @@ describe("e2e", () => {
 
   beforeAll(async () => {
     const wrapperPath = `${__dirname}/integration`;
-    await buildWrapper(wrapperPath);
+    const { exitCode, stdout, stderr } = await Commands.build(
+      undefined, {
+        cwd: wrapperPath,
+        env: process.env as Record<string, string>
+      }
+    );
+
+    if (exitCode !== 0) {
+      throw new Error(stdout + stderr);
+    }
+
     fsUri = `fs/${wrapperPath}/build`;
 
     const config = new ClientConfigBuilder()

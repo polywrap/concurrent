@@ -3,6 +3,8 @@ name: concurrent-interface-cd
 on:
   pull_request:
     types: [closed]
+    branches:
+      - main
     paths:
       - "interface/**"
 
