@@ -9,7 +9,7 @@
     "deploy": "npx polywrap deploy"
   },
   "devDependencies": {
-    "@polywrap/wasm-as": "0.10.0-pre.8",
+    "@polywrap/wasm-as": "0.9.6",
     "assemblyscript": "0.19.23"
   }
 }

@@ -1,5 +1,4 @@
-import { CoreClient, InvokeResult, Uri } from "@polywrap/core-js";
-import { PluginFactory, PluginPackage } from "@polywrap/plugin-js";
+import { Client, PluginFactory, InvokeResult, Uri } from "@polywrap/core-js";
 import { msgpackEncode } from "@polywrap/msgpack-js"
 import {
   Args_abort,
@@ -25,7 +24,7 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
 
   public async result(
     input: Args_result,
-    client: CoreClient
+    client: Client
   ): Promise<Array<Concurrent_TaskResult>> {
     switch (input.returnWhen) {
       case Concurrent_ReturnWhenEnum.FIRST_COMPLETED: {
@@ -65,12 +64,12 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
 
   public async status(
     input: Args_status,
-    client: CoreClient
+    client: Client
   ): Promise<Array<Concurrent_TaskStatus>> {
     return input.taskIds.map((id) => this._status[id]);
   }
 
-  public schedule(input: Args_schedule, client: CoreClient): Array<Int> {
+  public schedule(input: Args_schedule, client: Client): Array<Int> {
     return input.tasks.map((task) => {
       return this.scheduleTask(
         {
@@ -81,11 +80,11 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
     });
   }
 
-  public abort(args: Args_abort, client: CoreClient): Array<boolean> {
+  public abort(args: Args_abort, client: Client): Array<boolean> {
     return args.taskIds.map(_id => false);
   }
 
-  private scheduleTask(task: Concurrent_Task, client: CoreClient): number {
+  private scheduleTask(task: Concurrent_Task, client: Client): number {
     this._tasks[this._totalTasks] = client.invoke({
       uri: Uri.from(task.uri),
       method: task.method,
@@ -127,6 +126,9 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
 }
 
 export const concurrentPromisePlugin: PluginFactory<NoConfig> = () =>
-  new PluginPackage(new ConcurrentPromisePlugin({}), manifest);
+({
+  manifest,
+  factory: () => new ConcurrentPromisePlugin({}),
+});
 
 export const plugin = concurrentPromisePlugin;
