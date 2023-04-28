@@ -4,13 +4,11 @@ project:
   name: concurrency-demo
 source:
   module: ./src/index.ts
-  schema: ./src/schema.graphql
+  schema: ./polywrap.graphql
   # TODO: remove these when this is fixed:
   # https://github.com/polywrap/toolchain/issues/1598
   import_abis:
     - uri: "ens/wraps.eth:concurrent@1.0.0"
-      abi: ../../../../../interface/src/schema.graphql
+      abi: ../../../../../interface/polywrap.graphql
     - uri: "ens/wraps.eth:http@1.1.0"
       abi: ./abis/http.graphql
-extensions:
-  build: ./polywrap.build.yaml

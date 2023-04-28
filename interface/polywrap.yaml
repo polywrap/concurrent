@@ -3,6 +3,5 @@ project:
   name: concurrent-interface
   type: interface
 source:
-  schema: ./src/schema.graphql
-extensions:
-  deploy: ./polywrap.deploy.yaml
+  schema: ./polywrap.graphql
+resources: ./resources
