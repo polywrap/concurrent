@@ -1,6 +1,0 @@
-# TODO: change back to "ens/wraps.eth:concurrent@1.0.0" when this issue is fixed:
-# https://github.com/polywrap/toolchain/issues/1598
-
-#import { Module } into Concurrent from "ipfs/QmSXBti6Zf9yAXShBUCe79B1cpAeMZZKj7Ai1iF4g2EFNM"
-
-type Module implements Concurrent_Module {}

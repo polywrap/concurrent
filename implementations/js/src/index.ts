@@ -7,11 +7,11 @@ import {
   Args_schedule,
   Args_status,
   Int,
-  Concurrent_ReturnWhenEnum,
-  Concurrent_Task,
-  Concurrent_TaskResult,
-  Concurrent_TaskStatus,
-  Concurrent_TaskStatusEnum,
+  ReturnWhenEnum,
+  Task,
+  TaskResult,
+  TaskStatus,
+  TaskStatusEnum,
   manifest,
   Module,
 } from "./wrap";
@@ -21,25 +21,25 @@ type NoConfig = Record<string, never>;
 export class ConcurrentPromisePlugin extends Module<NoConfig> {
   private _totalTasks = 0;
   private _tasks: Record<number, Promise<InvokeResult>> = {};
-  private _status: Record<number, Concurrent_TaskStatus> = {};
+  private _status: Record<number, TaskStatus> = {};
 
   public async result(
     input: Args_result,
     client: CoreClient
-  ): Promise<Array<Concurrent_TaskResult>> {
+  ): Promise<Array<TaskResult>> {
     switch (input.returnWhen) {
-      case Concurrent_ReturnWhenEnum.FIRST_COMPLETED: {
+      case ReturnWhenEnum.FIRST_COMPLETED: {
         const result = await Promise.race(
           input.taskIds.map((id) => this.resolveTask(id))
         );
         return [result];
       }
-      case Concurrent_ReturnWhenEnum.ALL_COMPLETED: {
+      case ReturnWhenEnum.ALL_COMPLETED: {
         return await Promise.all(
           input.taskIds.map((id) => this.resolveTask(id))
         );
       }
-      case Concurrent_ReturnWhenEnum.ANY_COMPLETED: {
+      case ReturnWhenEnum.ANY_COMPLETED: {
         const result = await Promise.any(
           input.taskIds.map((id) => this.resolveTask(id)
             .then((result) => {
@@ -53,7 +53,7 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
             taskId: id,
             result: undefined,
             error: err.errors[idx],
-            status: Concurrent_TaskStatusEnum.FAILED,
+            status: TaskStatusEnum.FAILED,
           }))
         );
         return Array.isArray(result) ? result : [result];
@@ -66,7 +66,7 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
   public async status(
     input: Args_status,
     client: CoreClient
-  ): Promise<Array<Concurrent_TaskStatus>> {
+  ): Promise<Array<TaskStatus>> {
     return input.taskIds.map((id) => this._status[id]);
   }
 
@@ -85,42 +85,42 @@ export class ConcurrentPromisePlugin extends Module<NoConfig> {
     return args.taskIds.map(_id => false);
   }
 
-  private scheduleTask(task: Concurrent_Task, client: CoreClient): number {
+  private scheduleTask(task: Task, client: CoreClient): number {
     this._tasks[this._totalTasks] = client.invoke({
       uri: Uri.from(task.uri),
       method: task.method,
       args: task.args,
     });
-    this._status[this._totalTasks] = Concurrent_TaskStatusEnum.RUNNING;
+    this._status[this._totalTasks] = TaskStatusEnum.RUNNING;
     return this._totalTasks++;
   }
 
-  private resolveTask(taskId: number): Promise<Concurrent_TaskResult> {
+  private resolveTask(taskId: number): Promise<TaskResult> {
     return this._tasks[taskId]
       .then((result: InvokeResult) => {
-        this._status[taskId] = Concurrent_TaskStatusEnum.COMPLETED;
+        this._status[taskId] = TaskStatusEnum.COMPLETED;
         if (!result.ok) {
           return {
             taskId,
             result: undefined,
             error: result.error?.message ?? `Unknown error occurred in concurrent task ${taskId}`,
-            status: Concurrent_TaskStatusEnum.FAILED,
+            status: TaskStatusEnum.FAILED,
           };
         }
         return {
           taskId: taskId,
           result: new Uint8Array(msgpackEncode(result.value)),
           error: undefined,
-          status: Concurrent_TaskStatusEnum.COMPLETED,
+          status: TaskStatusEnum.COMPLETED,
         };
       })
       .catch((err) => {
-        this._status[taskId] = Concurrent_TaskStatusEnum.FAILED;
+        this._status[taskId] = TaskStatusEnum.FAILED;
         return {
           taskId: taskId,
           result: undefined,
           error: err.message ?? `Unknown error occurred in concurrent task ${taskId}`,
-          status: Concurrent_TaskStatusEnum.FAILED,
+          status: TaskStatusEnum.FAILED,
         };
       });
   }
