@@ -1,37 +1,149 @@
+"""
+Indicates the current status of a task.
+"""
 enum TaskStatus {
-  PENDING  # applicable when running in pool
-  RUNNING
-  COMPLETED
-  CANCELLED  # applicable when threads/processes are used
-  FAILED
+    """
+    Task is scheduled but not yet running. This status is typically applicable when tasks are queued to run in a pool.
+    """
+    PENDING
+    """
+    Task is currently executing.
+    """
+    RUNNING
+    """
+    Task execution has been paused.
+    """
+    SUSPENDED
+    """
+    Task has completed execution successfully.
+    """
+    COMPLETED
+    """
+    Task execution has been cancelled before completion. This status is typically applicable when threads or processes are used and are aborted before they complete.
+    """
+    CANCELLED
+    """
+    Task has failed to execute successfully.
+    """
+    FAILED
 }
 
+"""
+Defines when the result() function should return, based on the status of the tasks.
+"""
 enum ReturnWhen {
-  FIRST_COMPLETED,  # return the first task that completes or fails
-  ANY_COMPLETED,  # return any task that completes or returns array of all the errors
-  ALL_COMPLETED,  # return result of all the tasks or failures
+    """
+    Return as soon as the first task completes or fails.
+    """
+    FIRST_COMPLETED
+    """
+    Return any task that completes or return an array of all the errors if tasks fail.
+    """
+    ANY_COMPLETED
+    """
+    Wait for all tasks to complete or fail and return the result.
+    """
+    ALL_COMPLETED
 }
 
+"""
+Indicates the priority level of a task. This helps determine the order in which tasks are executed.
+"""
+enum Priority {
+    """
+    Low priority. Tasks with this priority will be executed after tasks with higher priority.
+    """
+    LOW
+    """
+    Medium priority. This is the default priority for tasks.
+    """
+    MEDIUM
+    """
+    High priority. Tasks with this priority will be executed before tasks with lower priority.
+    """
+    HIGH
+}
+
+"""
+Defines the structure and parameters of a task.
+"""
 type Task {
-  uri: String!
-  method: String!
-  args: Bytes!
+    """
+    The URI of the wrapper to invoke.
+    """
+    uri: String!
+    """
+    The method to invoke.
+    """
+    method: String!
+    """
+    The arguments to be passed to the method upon invocation, serialized in MessagePack format.
+    """
+    args: Bytes!
+    """
+    The priority level of the task. This helps determine the order in which the task will be executed. Defaults to Priority.MEDIUM if not specified.
+    """
+    priority: Priority
+    """
+    A list of task IDs that the task depends on. The task will not be executed until all its dependencies have completed.
+    """
+    dependsOn: [Int!]
+    """
+    The maximum number of workers that should be used to execute this task. If not specified, the system will determine the optimal number of workers.
+    """
+    max_workers: Int
 }
 
+"""
+Defines the structure of the result returned by a task.
+"""
 type TaskResult {
-  taskId: Int!
-  result: Bytes
-  error: String
-  status: TaskStatus!
-}
-
-type Env {
-  max_workers: Int
+    """
+    The unique ID assigned to the task.
+    """
+    taskId: Int!
+    """
+    The result produced by the task, serialized in MessagePack format.
+    """
+    result: Bytes
+    """
+    An error message, present only if the task failed to execute successfully.
+    """
+    error: String
+    """
+    The current status of the task.
+    """
+    status: TaskStatus!
 }
 
 type Module {
-  result(taskIds: [Int!]!, returnWhen: ReturnWhen!): [TaskResult!]!
-  status(taskIds: [Int!]!): [TaskStatus!]!
-  schedule(tasks: [Task!]!): [Int!]! # returns taskIds
-  abort(taskIds: [String!]!): [Boolean!]!
+    """
+    Retrieve the results of one or more scheduled tasks. The 'returnWhen' parameter determines when the function should return.
+    """
+    result(taskIds: [Int!]!, returnWhen: ReturnWhen!): [TaskResult!]!
+
+    """
+    Retrieve the current status of one or more scheduled tasks.
+    """
+    status(taskIds: [Int!]!): [TaskStatus!]!
+
+    """
+    Schedule one or more tasks for execution. Returns an array of unique task IDs, one for each scheduled task.
+    """
+    schedule(tasks: [Task!]!): [Int!]!
+
+    """
+    Send a request to abort one or more scheduled tasks. Returns an array of booleans indicating whether each task was successfully aborted.
+    """
+    abort(taskIds: [Int!]!): [Boolean!]!
+
+    """
+    Pause execution of one or more scheduled tasks. Returns an array of booleans indicating whether each task was successfully paused.
+    """
+    pause(taskIds: [Int!]!): [Boolean!]!
+
+    """
+    Resume execution of one or more paused tasks. Returns an array of booleans indicating whether each task was successfully resumed.
+    """
+    resume(taskIds: [Int!]!): [Boolean!]!
 }
