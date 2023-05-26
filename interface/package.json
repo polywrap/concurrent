@@ -1,13 +1,15 @@
 {
-  "name": "@polywrap/concurrent-interface",
-  "description": "Concurrent interface",
-  "private": true,
+  "name": "@polywrap/concurrency-interface",
+  "description": "Polywrap Concurrency Interface",
   "version": "0.10.0",
   "scripts": {
     "build": "npx polywrap build",
-    "deploy": "npx polywrap deploy -o ./deployment.json"
+    "deploy": "npx polywrap deploy -o deployment.json"
   },
   "devDependencies": {
-    "polywrap": "0.10.2"
+    "polywrap": "0.10.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
