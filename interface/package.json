@@ -1,8 +1,6 @@
 {
-  "name": "@polywrap/concurrent-interface",
-  "description": "Concurrent interface",
+  "name": "concurrent",
   "private": true,
-  "version": "1.0.0",
   "scripts": {
     "build": "npx polywrap build",
     "deploy": "npx polywrap deploy -o ./deployment.json"
