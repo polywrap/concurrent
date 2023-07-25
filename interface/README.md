@@ -1,4 +1,4 @@
-# Concurrent Wrapper Interface
+# Concurrent Interface
 
 The concurrent interface provides a common concurrency interface that can be shared across various concurrency implementations, like Threads, Processes and even language specific primitives like JavaScript Promises.
 
