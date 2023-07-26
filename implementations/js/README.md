@@ -4,7 +4,7 @@ The Concurrent plugin enables wraps running within the Polywrap client to run mu
 
 ## Interface
 
-The Concurrent plugin implements an existing wrap interface at `wrap://ens/wraps.eth:concurrent@1.0.0`.
+The Concurrent plugin implements an existing wrap interface at `wrapscan.io/polywrap/concurrent@1.0`.
 
 ## Usage
 
@@ -15,7 +15,7 @@ import { concurrentPromisePlugin } from "@polywrap/concurrent-plugin-js";
 
 const config = new ClientConfigBuilder()
   .addPackage(
-    "wrap://ens/wraps.eth:concurrent@1.0.0",
+    "wrapscan.io/polywrap/concurrent@1.0",
     concurrentPromisePlugin({ })
   )
   .build();

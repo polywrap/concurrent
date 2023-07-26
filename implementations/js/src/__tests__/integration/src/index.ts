@@ -15,7 +15,7 @@ import {
   deserializegetResult,
 } from "./wrap/imported/Http_Module/serialization";
 
-const httpUri =  "wrap://ens/wraps.eth:http@1.1.0";
+const httpUri =  "wrapscan.io/polywrap/http@1.0";
 
 export class Module extends ModuleBase {
   asyncBatchFetch(args: Args_asyncBatchFetch): FetchResult[] {

@@ -1,1 +1,1 @@
-#import * from "ens/wraps.eth:concurrent@1.0.0"
+#import * from "wrapscan.io/polywrap/concurrent@1.0"

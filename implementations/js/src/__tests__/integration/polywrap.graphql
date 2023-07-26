@@ -1,5 +1,5 @@
-#import { Module, Response } into Http from "ens/wraps.eth:http@1.1.0"
-#import { Module, TaskResult } into Concurrent from "ens/wraps.eth:concurrent@1.0.0"
+#import { Module, Response } into Http from "wrapscan.io/polywrap/http@1.0"
+#import { Module, TaskResult } into Concurrent from "wrapscan.io/polywrap/concurrent@1.0"
 
 type FetchResult implements Concurrent_TaskResult {
   parsed: Http_Response

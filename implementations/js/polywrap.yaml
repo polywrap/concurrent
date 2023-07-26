@@ -1,4 +1,4 @@
-format: 0.3.0
+format: 0.4.0
 project:
   type: plugin/typescript
   name: concurrent-promise
@@ -6,5 +6,5 @@ source:
   module: ./src/index.ts
   schema: ./polywrap.graphql
   import_abis:
-    - uri: wrap://ens/wraps.eth:concurrent@1.0.0
+    - uri: wrapscan.io/polywrap/concurrent@1.0
       abi: ../../interface/polywrap.graphql
