@@ -1,7 +1,7 @@
 {
   "name": "@polywrap/concurrent-plugin-js",
   "description": "Run wrap invocations concurrently using promises",
-  "version": "0.12.0-pre.0",
+  "version": "0.12.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -22,9 +22,9 @@
     "publish:pre:npm": "yarn publish --access public --non-interactive --verbose --tag pre"
   },
   "dependencies": {
-    "@polywrap/core-js": "~0.12.0-pre.0",
-    "@polywrap/plugin-js": "~0.12.0-pre.0",
-    "@polywrap/msgpack-js": "~0.12.0-pre.0"
+    "@polywrap/core-js": "~0.12.0",
+    "@polywrap/plugin-js": "~0.12.0",
+    "@polywrap/msgpack-js": "~0.12.0"
   },
   "peerDependencies": {
     "@polywrap/core-js": "0.12.x",
@@ -32,12 +32,12 @@
     "@polywrap/msgpack-js": "0.12.x"
   },
   "devDependencies": {
-    "@polywrap/client-js": "~0.12.0-pre.0",
-    "@polywrap/http-plugin-js": "~0.12.0-pre.0",
-    "@polywrap/cli-js": "~0.11.0-pre.0",
+    "@polywrap/client-js": "~0.12.0",
+    "@polywrap/http-plugin-js": "~0.12.0",
+    "@polywrap/cli-js": "~0.11.0",
     "@types/jest": "29.5.0",
     "@types/prettier": "2.6.0",
-    "polywrap": "~0.11.0-pre.0",
+    "polywrap": "~0.11.0",
     "jest": "29.5.0",
     "rimraf": "3.0.2",
     "ts-jest": "29.1.0",
